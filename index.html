@@ -1,0 +1,342 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <link type="text/css" rel="stylesheet" href="style.css"/>
+  <link type="text/css" rel="stylesheet" href="bootstrap.min.css"/>
+  <title>Document</title>
+</head>
+<body>
+
+<header class="container-fluid bg-dark border-bottom border-secondary">
+  <div class="row justify-content-center p-2">
+    <div class="col-12 text-center text-light h1">
+      <p>Where's david's</p>
+      <p>code</p>
+    </div>
+  </div>
+</header>
+
+<section class="container-fluid mt-5">
+
+  <div class="row justify-content-center">
+    <div class="col-auto text-center text-light bg-dark p-2 pb-0 card h2">
+      <p>The alcoholic text</p>
+    </div>
+  </div>
+  <div class="row justify-content-around">
+    <div class="col-5">
+      <h3 class="text-center">JavaScript</h3>
+      <pre class="card border-0">
+      <code class="">
+        function alcoholText() {
+        //automates changing header text color
+
+          let text = [
+            "Amber", "Lager", "Blonde", "Pilsner", "Stout",
+            "Porter", "Sour", "Bitter", "IPA", "Wheat",
+            "Cider", "Ale"
+          ];
+          let counter = 0;
+          let elem = document.getElementById("role");
+          let inst = setInterval(change, 1400);
+
+          function change() {
+            elem.innerHTML = text[counter];
+            counter++;
+            if (counter >= text.length) {
+            counter = 0;
+            }
+          }
+        }
+      </code>
+      </pre>
+    </div>
+    <div class="col-5">
+      <h3 class="text-center">CSS</h3>
+      <pre class="card border-0">
+      <code>
+        #role {
+          background-color: lightcyan;
+          animation-name: example;
+          animation-duration: 4s;
+          height: auto;
+          animation-direction: alternate;
+          animation-iteration-count: infinite;
+          border-bottom: solid 2px #0000008c;
+          background-color: white;
+        }
+
+        @keyframes example {
+          0% {
+            background-color: gray;
+          }
+          25% {
+            background-color: goldenrod;
+          }
+          50% {
+            background-color: black;
+          }
+          100% {
+            background-color: gray;
+          }
+        }
+      </code>
+      </pre>
+    </div>
+  </div>
+  <div class="row justify-content-center mt-3">
+    <div class="col-auto text-center text-light bg-dark p-2 pb-0 card h2">
+      <p>The Map</p>
+    </div>
+  </div>
+  <div class="row justify-content-around">
+    <div class="col-5">
+      <h3 class="text-center">Initialization</h3>
+      <pre class="card border-0">
+      <code>
+        //map
+
+        window.businessLat = 0.0;
+        window.businessLong = 0.0;
+        window.businessName = "";
+        window.businessType = "";
+
+        // Populating map
+        window.myMap = L.map('mapId').setView([businessLat, businessLong], 15);
+        // console.log("the lat " + businessLat + " and long " + businessLong + " of my map");
+        L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
+          attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a
+              href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a
+              href="http://mapbox.com">Mapbox</a>',
+          maxZoom: 18,
+          id: 'mapbox.streets',
+          accessToken: 'pk.eyJ1IjoiZWdjYXJsIiwiYSI6ImNqZnhmcXljMjA5ZjkyeG5wcDNyZzR0cmIifQ.6TRl8bfjecwZjTuMbBlXFA'
+        }).addTo(myMap);
+
+        // initial load of marker on map.  creating a marker on the map
+        window.marker = L.marker([businessLat, businessLong]).addTo(myMap);
+
+        // adding popup to the marker that populates on click adding brewery name and type from beermapping
+        marker.bindPopup("&lt;b>" + businessName + "&lt;/b>" + "&lt;br>" + businessType);
+        // console.log("i don't show up after first click on a div result")
+
+        window.mpList = {
+          city: $("#mod-city"),
+          street: $("#mod-street"),
+          phone: $("#mod-phone"),
+          website: $("#mod-website"),
+          rating: $("#mod-rating")
+        };
+
+      </code>
+      </pre>
+    </div>
+    <div class="col-5">
+      <h3 class="text-center">Pop-Up on Click</h3>
+      <pre class="card border-0">
+      <code>
+        let searchResult = $(".search-result-div");
+        let mapModal = $("#map-modal");
+        searchResult.off("click");
+        searchResult.on("click", function (event) {
+        if (typeof $(this).attr("data-direction") !== "undefined") {
+          return
+        }
+
+        let data = $(this).parent().data("brew");
+        let selected = $(this).parent();
+        let barID = $(this).attr("data-id");
+
+        let queryURL = "https://beermapping.com/webservice/locmap/1d0dec692e53fe232ce728a7b7212c52/" + barID + "&s=json";
+        // search the beermappingDB
+        $.ajax({
+          url: queryURL,
+          method: "GET"
+        }).then(function (response) {
+          console.log("this is the response object - ", response);
+          favorite(data, selected);
+          mapModal.fadeIn(250, () => {
+            mapExit();
+          });
+
+          response.forEach(element => {
+            // console.log(element.lat);
+            // console.log(element.lng);
+            window.businessLat = element.lat;
+            window.businessLong = element.lng;
+            window.businessName = element.name;
+            window.businessType = element.status;
+            $("#map-title").text(window.businessName);
+            mpList.city.text("City: " + data.city);
+            mpList.street.text("Street: " + data.street);
+            if (data.phone.length < 1) {
+              mpList.phone.text("Phone: Unavailable");
+            }
+            else {
+              mpList.phone.text("Phone: " + data.phone);
+            }
+            if (data.url.length < 1) {
+              mpList.website.text("Website: Unavailable");
+              mpList.website.attr("href", `#`);
+            }
+            else {
+              mpList.website.text(data.url);
+              mpList.website.attr("href", `https://${data.url}`);
+            }
+            if (parseInt(data.overall) < 1) {
+              mpList.rating.text("Rating: Unavailable");
+            }
+            else {
+              mpList.rating.text("Rating: " + data.overall);
+            }
+            // console.log(businessLat + "this is now var businessLat");
+            // console.log(businessLong + "this is now var businessLong");
+            myMap.invalidateSize();
+            window.myMap.setView(new L.LatLng(window.businessLat, window.businessLong), 15);
+            window.marker.setLatLng(new L.LatLng(window.businessLat, window.businessLong));
+            window.marker.setPopupContent("&lt'b>" + window.businessName + "&lt;/b>" + "&lt;br>" + window.businessType).openPopup();
+          })
+        })
+      </code>
+      </pre>
+    </div>
+  </div>
+
+  <div class="row justify-content-center mt-3">
+    <div class="col-auto text-center text-light bg-dark p-2 pb-0 card h2">
+      <p>PHP Contact Jazz</p>
+    </div>
+  </div>
+  <div class="row justify-content-around">
+    <div class="col-5">
+      <h3 class="text-center">JavaScript</h3>
+      <pre class="card border-0">
+      <code>
+        function alcoholText() {
+          let text = [
+            "Amber", "Lager", "Blonde", "Pilsner", "Stout",
+            "Porter", "Sour", "Bitter", "IPA", "Wheat",
+            "Cider", "Ale"
+          ];
+          let counter = 0;
+          let elem = document.getElementById("role");
+          let inst = setInterval(change, 1400);
+
+          function change() {
+            elem.innerHTML = text[counter];
+            counter++;
+            if (counter >= text.length) {
+            counter = 0;
+            }
+          }
+        }
+      </code>
+      </pre>
+    </div>
+    <div class="col-5">
+      <h3 class="text-center">CSS</h3>
+      <pre class="card border-0">
+      <code>
+        #role {
+          background-color: lightcyan;
+          animation-name: example;
+          animation-duration: 4s;
+          height: auto;
+          animation-direction: alternate;
+          animation-iteration-count: infinite;
+          border-bottom: solid 2px #0000008c;
+          background-color: white;
+        }
+
+        @keyframes example {
+          0% {
+            background-color: gray;
+          }
+          25% {
+            background-color: goldenrod;
+          }
+          50% {
+            background-color: black;
+          }
+          100% {
+            background-color: gray;
+          }
+        }
+      </code>
+      </pre>
+    </div>
+  </div>
+
+  <div class="row justify-content-center mt-3">
+    <div class="col-auto text-center text-light bg-dark p-2 pb-0 card h2">
+      <p>PHP Contact Jazz</p>
+    </div>
+  </div>
+  <div class="row justify-content-around">
+    <div class="col-5">
+      <h3 class="text-center">JavaScript</h3>
+      <pre class="card border-0">
+      <code>
+        function alcoholText() {
+          let text = [
+            "Amber", "Lager", "Blonde", "Pilsner", "Stout",
+            "Porter", "Sour", "Bitter", "IPA", "Wheat",
+            "Cider", "Ale"
+          ];
+          let counter = 0;
+          let elem = document.getElementById("role");
+          let inst = setInterval(change, 1400);
+
+          function change() {
+            elem.innerHTML = text[counter];
+            counter++;
+            if (counter >= text.length) {
+            counter = 0;
+            }
+          }
+        }
+      </code>
+      </pre>
+    </div>
+    <div class="col-5">
+      <h3 class="text-center">CSS</h3>
+      <pre class="card border-0">
+      <code>
+        #role {
+          background-color: lightcyan;
+          animation-name: example;
+          animation-duration: 4s;
+          height: auto;
+          animation-direction: alternate;
+          animation-iteration-count: infinite;
+          border-bottom: solid 2px #0000008c;
+          background-color: white;
+        }
+
+        @keyframes example {
+          0% {
+            background-color: gray;
+          }
+          25% {
+            background-color: goldenrod;
+          }
+          50% {
+            background-color: black;
+          }
+          100% {
+            background-color: gray;
+          }
+        }
+      </code>
+      </pre>
+    </div>
+  </div>
+
+</section>
+
+</body>
+</html>
