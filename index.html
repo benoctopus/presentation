@@ -28,7 +28,7 @@
     </div>
   </div>
   <div class="row justify-content-around">
-    <div class="col-5">
+    <div class="col-md-5 col-12">
       <h3 class="text-center">JavaScript</h3>
       <pre class="card border-0">
       <code class="">
@@ -55,7 +55,7 @@
       </code>
       </pre>
     </div>
-    <div class="col-5">
+    <div class="col-md-5 col-12">
       <h3 class="text-center">CSS</h3>
       <pre class="card border-0">
       <code>
@@ -94,7 +94,7 @@
     </div>
   </div>
   <div class="row justify-content-around">
-    <div class="col-5">
+    <div class="col-md-5 col-12">
       <h3 class="text-center">Initialization</h3>
       <pre class="card border-0">
       <code>
@@ -135,7 +135,7 @@
       </code>
       </pre>
     </div>
-    <div class="col-5">
+    <div class="col-md-5 col-12">
       <h3 class="text-center">Pop-Up on Click</h3>
       <pre class="card border-0">
       <code>
@@ -208,62 +208,65 @@
 
   <div class="row justify-content-center mt-3">
     <div class="col-auto text-center text-light bg-dark p-2 pb-0 card h2">
-      <p>PHP Contact Jazz</p>
+      <p>Database</p>
     </div>
   </div>
   <div class="row justify-content-around">
-    <div class="col-5">
-      <h3 class="text-center">JavaScript</h3>
+    <div class="col-md-5 col-12">
+      <h3 class="text-center">JSON</h3>
       <pre class="card border-0">
       <code>
-        function alcoholText() {
-          let text = [
-            "Amber", "Lager", "Blonde", "Pilsner", "Stout",
-            "Porter", "Sour", "Bitter", "IPA", "Wheat",
-            "Cider", "Ale"
-          ];
-          let counter = 0;
-          let elem = document.getElementById("role");
-          let inst = setInterval(change, 1400);
 
-          function change() {
-            elem.innerHTML = text[counter];
-            counter++;
-            if (counter >= text.length) {
-            counter = 0;
-            }
+        //database snapshot
+
+        {
+         "users" : {
+           "ashdlfkj" : {
+             "favorites" : "[]",
+             "location" : {
+               "city" : "san mateo",
+               "lat" : 37.5402,
+               "lon" : -122.3041,
+               "state" : "ca",
+               "stateFull" : "California",
+               "zip" : "94403"
+             },
+             "username" : "ashdlfkj"
+           }
           }
         }
       </code>
       </pre>
     </div>
-    <div class="col-5">
-      <h3 class="text-center">CSS</h3>
+    <div class="col-md-5 col-12">
+      <h3 class="text-center">JavaScript</h3>
       <pre class="card border-0">
       <code>
-        #role {
-          background-color: lightcyan;
-          animation-name: example;
-          animation-duration: 4s;
-          height: auto;
-          animation-direction: alternate;
-          animation-iteration-count: infinite;
-          border-bottom: solid 2px #0000008c;
-          background-color: white;
-        }
+        function storeUser(input) {
+        //store user data in db, try catch to prevent buggy api behavior
 
-        @keyframes example {
-          0% {
-            background-color: gray;
+          console.log("storeUser");
+          try {
+            dbRef.user = db.ref(
+              `/users/${input}`
+            );
+            dbRef.user.set({
+              username: input,
+              location: userData.location,
+              favorites: JSON.stringify(userData.favorites)
+            });
+            userData.name = input;
+            localStorage.location = JSON.stringify(userData.location);
+            localStorage.username = input;
+            window.state = "home";
+            displaySwitch();
+
           }
-          25% {
-            background-color: goldenrod;
-          }
-          50% {
-            background-color: black;
-          }
-          100% {
-            background-color: gray;
+          catch (err) {
+            console.log("waiting...");
+            setTimeout(() => {
+              storeUser(input)
+            }, 500);
           }
         }
       </code>
@@ -273,64 +276,161 @@
 
   <div class="row justify-content-center mt-3">
     <div class="col-auto text-center text-light bg-dark p-2 pb-0 card h2">
-      <p>PHP Contact Jazz</p>
+      <p>jQuery element creation</p>
     </div>
   </div>
   <div class="row justify-content-around">
-    <div class="col-5">
-      <h3 class="text-center">JavaScript</h3>
+    <div class="col-md-5 col-12">
+      <h3 class="text-center">Ajax call</h3>
       <pre class="card border-0">
       <code>
-        function alcoholText() {
-          let text = [
-            "Amber", "Lager", "Blonde", "Pilsner", "Stout",
-            "Porter", "Sour", "Bitter", "IPA", "Wheat",
-            "Cider", "Ale"
-          ];
-          let counter = 0;
-          let elem = document.getElementById("role");
-          let inst = setInterval(change, 1400);
+        function getBrews(city, state) {
+          //search brews
 
-          function change() {
-            elem.innerHTML = text[counter];
-            counter++;
-            if (counter >= text.length) {
-            counter = 0;
-            }
+          function separateResults(response) {
+            //separate ajax response into sets of 20
+
+            let i = 0;
+            let tmp = [];
+            window.brews = {
+              offset: 0,
+              data: []
+            };
+
+            response.forEach((brew, index) => {
+
+              if (i < 20) {
+                tmp.push(brew);
+                i++;
+
+                if (index === response.length - 1) {
+                  brews.data.push(tmp);
+                }
+              }
+
+              else {
+                brews.data.push(tmp);
+                tmp = [];
+                i = 0
+              }
+            });
           }
+
+          let url = "https://beermapping.com/webservice/loccity/1d0dec692e53fe232ce728a7b7212c52/"
+            + city
+            + ","
+            + state
+            + "&s=json";
+
+          //returns 100 results, non modifiable
+          $.ajax({
+            url: url,
+            method: "GET"
+          }).then(response => {
+            console.log(response);
+            separateResults(response);
+            displayBrews($(
+              //sends to current page's result section
+              `#${window.state}-results`
+            ), 0)
+          });
         }
       </code>
       </pre>
     </div>
-    <div class="col-5">
-      <h3 class="text-center">CSS</h3>
+    <div class="col-md-5 col-12">
+      <h3 class="text-center">Element Creation</h3>
       <pre class="card border-0">
       <code>
-        #role {
-          background-color: lightcyan;
-          animation-name: example;
-          animation-duration: 4s;
-          height: auto;
-          animation-direction: alternate;
-          animation-iteration-count: infinite;
-          border-bottom: solid 2px #0000008c;
-          background-color: white;
-        }
+        function displayBrews(target, offset) {
 
-        @keyframes example {
-          0% {
-            background-color: gray;
+          function cascadeDisplay(array, i, target) {
+            //cascade effect for dynamic results
+
+            console.log("cascade");
+
+            if (i < array.length) {
+              $(array[i]).fadeIn(50, () => {
+                i++;
+                cascadeDisplay(array, i, target)
+              });
+            }
+            else {
+              pageButtons(target, true)
+            }
           }
-          25% {
-            background-color: goldenrod;
+
+          function pageButtons(target, pos) {
+            //create display buttons and activate listener
+
+            console.log("page buttons");
+
+            let row = $("&lt;div class='row mt-4 mob-row p-0'>&lt;/div>");
+
+            let left = $(
+              "&lt;div class='left col-6 text-center btn mob-button p-0 m-0 card search-result-div'"
+              + " data-direction='left'>&lt;p><&lt;/p>&lt;/div>"
+            );
+            if (brews.offset === 0) {
+            left.addClass("invisible")
+            }
+            row.append(left);
+
+            let right = $(
+            "&lt;div class='right col-6 text-center btn mob-button p-0 m-0 card search-result-div'"
+            + " data-direction='right'>&lt;p>>&lt;/p>&lt;/div>"
+          );
+          if (brews.offset === brews.data.length - 1) {
+          right.addClass("invisible")
           }
-          50% {
-            background-color: black;
+          row.append(right);
+
+          if (!pos) {
+          target.prepend(row);
           }
-          100% {
-            background-color: gray;
+          else if (pos) {
+          target.append(row);
+          listeners.mobility()
           }
-        }
+          }
+
+          //dynamically create elements
+
+          $(`#${window.state}-results`).empty();
+
+          if (window.brews.data[0].length < 1
+          || window.brews.data[0][0].name === null) {
+
+          target.append($(
+          "&lt;div class='row justify-content-center text-center color-text welcome'>" +
+          "&lt;h1 class='col-auto'>No Results Found&lt;/h1>" +
+          "&lt;/div>")
+          );
+          return;
+          }
+
+          window.brews.data[offset].forEach(data => {
+
+          //fix names formatted "name, the"
+          if (data.name.indexOf(",") > -1) {
+          data.name = data.name.split(",")[1] + " " + data.name.split(",")[0]
+          }
+
+          //big title, small street address
+          let elem = $(
+          `&lt;div class="row justify-content-center mt-4 p-0">`
+          + `&lt;div class="col-12 search-result-div card btn" data-id="${data.id}" style="display: none; overflow: hidden">`
+            + `&lt;div class="row text-center justify-content-center card-body">`
+              + `&lt;div class="col-12 result-name result-text color-text" style="text-shadow: none">&lt;h1>${data.name.split("-")[0]}&lt;/h1>&lt;/div>`
+              + `&lt;div class="col-12 result-name result-text text-dark" style="text-shadow: none">&lt;h2>${data.street}&lt;/h2>&lt;/div>`
+              + `&lt;/div>&lt;/div>&lt;/div>`
+          );
+
+          //store original data on jquery object
+          elem.data("brew", data);
+          target.append(elem);
+          }
+        );
       </code>
       </pre>
     </div>
