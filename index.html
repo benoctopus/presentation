@@ -418,12 +418,12 @@
 
           //big title, small street address
           let elem = $(
-          `&lt;div class="row justify-content-center mt-4 p-0">`
-          + `&lt;div class="col-12 search-result-div card btn" data-id="${data.id}" style="display: none; overflow: hidden">`
+            `&lt;div class="row justify-content-center mt-4 p-0">`
+            + `&lt;div class="col-12 search-result-div card btn" data-id="${data.id}" style="display: none; overflow: hidden">`
             + `&lt;div class="row text-center justify-content-center card-body">`
-              + `&lt;div class="col-12 result-name result-text color-text" style="text-shadow: none">&lt;h1>${data.name.split("-")[0]}&lt;/h1>&lt;/div>`
-              + `&lt;div class="col-12 result-name result-text text-dark" style="text-shadow: none">&lt;h2>${data.street}&lt;/h2>&lt;/div>`
-              + `&lt;/div>&lt;/div>&lt;/div>`
+            + `&lt;div class="col-12 result-name result-text color-text">&lt;h1>${data.name.split("-")[0]}&lt;/h1>&lt;/div>`
+            + `&lt;div class="col-12 result-name result-text text-dark">&lt;h2>${data.street}&lt;/h2>&lt;/div>`
+            + `&lt;/div>&lt;/div>&lt;/div>`
           );
 
           //store original data on jquery object
